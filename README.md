@@ -8,7 +8,7 @@
 # Зависимости
 Зависимости:
 - Python3
-- Docker
+- Docker-compose V3
 
 # Дополнительно
 
