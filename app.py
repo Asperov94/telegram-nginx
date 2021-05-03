@@ -1,40 +1,28 @@
-from flask import Flask, request, abort, jsonify
+# -*- coding: utf-8 -*-
+"""send message to telegram via nginx"""
 import requests
-import json
 import yaml
+from flask import Flask, request, abort, jsonify
 
-#---------
 def telegram(text, bot):
-
+    """ Send message func """
     url = "https://api.telegram.org/bot" + bot + "/sendMessage"
-    print(url)
-    headers = {'Content-type': 'application/json',
-               'Accept': 'text/plain',
-               'Content-Encoding': 'utf-8'}
     data = {"chat_id" : config["chat_id"], "text" : text}
-
     response = requests.post( url, json=data)
-    print(response)
 
-#--------
 with open("config.yml", "r") as ymlfile:
     config = yaml.load(ymlfile)
 
 app = Flask(__name__)
 
-@app.route('/telegram', methods=['POST'])
+@app.route('/' + config["url"], methods=['POST'])
 def handle_push():
+    """push message to nginx"""
     if not request.json:
         abort(400)
     telegram(request.json.get('text'), config["bot"])
     return jsonify ({'status': 'ok'}) , 200
 
-#@app.route('/json', methods=['GET', 'POST'])
-#def json():
-#    content = request.json
-#    print (content)
-#    return jsonify(content), 200
-
 if __name__ == '__main__':
     print("Listening...")
-    app.run(host=config["host"], port=5000)
+    app.run(host=config["host"], port=config["port"])
